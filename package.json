@@ -24,7 +24,7 @@
     "npm": ">= 3.0.0"
   },
   "scripts": {
-    "build": "cd ui && npm install && npm run build && cp -R ./build/. ../public/.",
+    "build": "cd ui && npm install && npm run build && cp -Rf ./build/. ../public/.",
     "test": "npm run lint && npm run mocha",
     "lint": "eslint src/. test/. --config .eslintrc.json --fix",
     "dev": "nodemon src/",
