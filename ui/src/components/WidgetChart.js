@@ -1,25 +1,13 @@
-import React, { useState } from "react"
-import { Line, LineChart } from "recharts";
+import React from "react"
+import { Line, LineChart, YAxis } from "recharts";
 
-const WidgetChart = ({ name, color, height, width }) => {
-  const [data] = useState([{
-    name: name,
-    uv: 0
-  }, {
-    name: name,
-    uv: 500
-  }, {
-    name: name,
-    uv: 350
-  }, {
-    name: name,
-    uv: 0
-  }])
+const WidgetChart = ({ field, color, height, width, data }) => {
   return (
     <LineChart height={height || 50} width={width || 50} data={data}>
       <Line
         isAnimationActive={false}
-        type="monotone" dataKey="uv" stroke={color} strokeWidth={3} />
+        type="monotone" dataKey={field} stroke={color} strokeWidth={3} />
+      <YAxis mirror/>
     </LineChart>
   )
 }

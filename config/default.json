@@ -28,5 +28,8 @@
       "passwordField": "password"
     }
   },
-  "postgres": "postgres://postgres:ilomon0123@localhost:5432/plz_smart_farm"
+  "postgres": {
+    "connection": "postgres://postgres:ilomon0123@localhost:5432/plz_smart_farm",
+    "ssl": false
+  }
 }

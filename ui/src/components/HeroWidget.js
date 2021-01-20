@@ -1,24 +1,7 @@
-import React, { useState } from "react";
-import { AreaChart, Area, Tooltip } from "recharts";
+import React from "react";
+import { AreaChart, Area, Tooltip, YAxis } from "recharts";
 
-const HeroWidget = ({ width, height }) => {
-  const name = "Hero"
-  const [data] = useState([{
-    name: name,
-    uv: 250
-  }, {
-    name: name,
-    uv: 500
-  }, {
-    name: name,
-    uv: 350
-  }, {
-    name: name,
-    uv: 400
-  }, {
-    name: name,
-    uv: 250
-  }])
+const HeroWidget = ({ width, height, fields, data, selected }) => {
   return (
     <AreaChart
       height={height || 50}
@@ -33,9 +16,31 @@ const HeroWidget = ({ width, height }) => {
         </linearGradient>
       </defs>
       <Tooltip />
-      <Area
+      {selected.map((item, idx) => (
+        <Area
+          key={`${item}-area`}
+          yAxisId={idx}
+          isAnimationActive={false}
+          type="monotone"
+          dataKey={item}
+          stroke={fields.find(({ field }) => field === item).color}
+          strokeWidth={8}
+          fillOpacity={0.75}
+          fill="url(#colorUv)"
+        />
+      ))}
+      {selected.map((item, idx) => (
+        <YAxis
+          key={`${item}-yaxis`}
+          yAxisId={idx}
+          mirror
+          axisLine={{
+            stroke: fields.find(({ field }) => field === item).color
+          }} />
+      ))}
+      {/* <Area
         isAnimationActive={false}
-        type="monotone" dataKey="uv" stroke="#34495e" strokeWidth={8} fillOpacity={1} fill="url(#colorUv)" />
+        type="monotone" dataKey="uv" stroke="#34495e" strokeWidth={8} fillOpacity={1} fill="url(#colorUv)" /> */}
     </AreaChart>
   )
 }

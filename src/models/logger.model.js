@@ -5,25 +5,9 @@ const DataTypes = Sequelize.DataTypes;
 
 module.exports = function (app) {
   const sequelizeClient = app.get('sequelizeClient');
-  const datalake = sequelizeClient.define('datalake', {
-    kelengasan: {
-      type: DataTypes.DECIMAL,
-      allowNull: false
-    },
-    suhu: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
-    kelembapan: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
-    cahaya: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
-    air: {
-      type: DataTypes.DECIMAL,
+  const logger = sequelizeClient.define('logger', {
+    text: {
+      type: DataTypes.STRING,
       allowNull: false
     }
   }, {
@@ -35,10 +19,10 @@ module.exports = function (app) {
   });
 
   // eslint-disable-next-line no-unused-vars
-  datalake.associate = function (models) {
+  logger.associate = function (models) {
     // Define associations here
     // See http://docs.sequelizejs.com/en/latest/docs/associations/
   };
 
-  return datalake;
+  return logger;
 };

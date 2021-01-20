@@ -5,12 +5,13 @@ import ReactResizeDetector from 'react-resize-detector';
 import AspectRatio from "./AspectRatio";
 import WidgetChart from "./WidgetChart";
 
-const Widget = ({ name, style, color }) => {
+const Widget = ({ name, field, style, color, data, active }) => {
   return (
     <AspectRatio ratio="16:9">
       <BorderBox
         p={2}
         backgroundColor="white"
+        borderColor={active ? "blue.5" : undefined}
         style={{
           ...style,
           position: "absolute",
@@ -32,9 +33,9 @@ const Widget = ({ name, style, color }) => {
             </Box>
           </Flex>
           <ReactResizeDetector>
-            {({ width, height }) => (
-              <Box flexGrow={1}>
-                <WidgetChart name={name} color={color} width={width} height={height} />
+            {({ width, height, targetRef }) => (
+              <Box ref={targetRef} flexGrow={1}>
+                <WidgetChart field={field} color={color} width={width} height={height} data={data} />
               </Box>)}
           </ReactResizeDetector>
         </Flex>

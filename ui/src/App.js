@@ -1,13 +1,18 @@
-import { useState } from "react";
-import { Avatar, Flex, Box, Button, Text, Dropdown } from "@primer/components";
-import Widget from "./components/Widget";
+import { useContext, useEffect, useState } from "react";
+import { Avatar, Flex, Box, Button, Text, Dropdown, SelectMenu } from "@primer/components";
+import { HeartFillIcon, ThreeBarsIcon } from "@primer/octicons-react";
 import ReactResizeDetector from 'react-resize-detector';
-import { ThreeBarsIcon } from "@primer/octicons-react";
+import Widget from "./components/Widget";
 import HeroWidget from "./components/HeroWidget";
 import State from "./components/State";
+import { FeathersContext } from "./components/feathers";
 
 function App() {
-  const [data] = useState([{
+  const feathers = useContext(FeathersContext);
+  const [totalData, setTotalData] = useState(0);
+  const [data, setData] = useState([]);
+  const [selected, setSelected] = useState(["kelengasan"]);
+  const [fields] = useState([{
     color: "#9b59b6",
     field: "kelengasan",
     name: "Tanah",
@@ -33,6 +38,22 @@ function App() {
     name: "Air",
     alt: "Air yang digunakan"
   }]);
+
+  useEffect(() => {
+    const fetch = async () => {
+      const d = await feathers.datalake.find({
+        query: {
+          $limit: 100
+        }
+      });
+      setTotalData(d.total);
+      setData(d.data);
+    }
+    fetch();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <Box
       backgroundColor="gray.5"
@@ -49,15 +70,27 @@ function App() {
         flexDirection="column"
         style={{
           height: "100%",
-          maxWidth: 400,
+          maxWidth: 500,
           overflowX: "hidden",
           overflowY: "auto",
           margin: "0 auto"
         }}>
         <Box py={2} px={4}>
-          <Button variant="medium">
-            <ThreeBarsIcon size={16} />
-          </Button>
+          <SelectMenu>
+            <Button as="summary" variant="medium">
+              <ThreeBarsIcon size={16} />
+            </Button>
+            <SelectMenu.Modal>
+              <SelectMenu.Header>Halaman</SelectMenu.Header>
+              <SelectMenu.List>
+                <SelectMenu.Item href="#">Chart</SelectMenu.Item>
+                <SelectMenu.Item href="#">Table</SelectMenu.Item>
+              </SelectMenu.List>
+              <SelectMenu.Header>
+                <Text color="gray.5">Made with <Text color="red.5"><HeartFillIcon size={14} /></Text> by tagConn</Text>
+              </SelectMenu.Header>
+            </SelectMenu.Modal>
+          </SelectMenu>
         </Box>
         <Flex px={4} alignItems="center">
           <Box flexGrow={1}>
@@ -76,7 +109,7 @@ function App() {
         <Flex px={4} pb={3} alignItems="center">
           <Box flexGrow={1}>
             <Text as="div">Total data</Text>
-            <Text as="div" fontSize={28} fontWeight="bold">283k</Text>
+            <Text as="div" fontSize={28} fontWeight="bold">{totalData}</Text>
           </Box>
           <Box>
             <State>
@@ -116,23 +149,37 @@ function App() {
           style={{ overflowY: "auto", whiteSpace: "nowrap" }}
           flexShrink={0}
         >
-          {data.map((d) => (
+          {fields.map(({ name, alt, color, field }) => (
             <Box
-              key={d.field}
+              key={field}
               px={2}
               display="inline-block"
               width="70%"
+              onClick={() => {
+                setSelected(selected => {
+                  return selected.indexOf(field) !== -1 ?
+                    selected.length === 1 ?
+                      selected : selected.filter(item => item !== field) : [...selected, field];
+                })
+              }}
             >
-              <Widget name={d.name} alt={d.alt} field={d.field} color={d.color} />
+              <Widget
+                name={name}
+                alt={alt}
+                field={field}
+                color={color}
+                data={data}
+                active={selected.indexOf(field) !== -1}
+              />
             </Box>
           ))}
         </Box>
         <ReactResizeDetector>
-          {({ width, height }) => {
+          {({ width, height, targetRef }) => {
             const h = height / width * 100 <= 25 ? 50 / 100 * width : height;
             return (
-              <Box flexGrow={1}>
-                <HeroWidget width={width} height={h} />
+              <Box ref={targetRef} flexGrow={1}>
+                <HeroWidget width={width} height={h} fields={fields} data={data} selected={selected} />
               </Box>)
           }}
         </ReactResizeDetector>

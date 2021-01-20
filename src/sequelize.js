@@ -1,14 +1,11 @@
 const Sequelize = require('sequelize');
 
 module.exports = function (app) {
-  const connectionString = app.get('postgres');
+  const connectionString = app.get('postgres').connection;
   const sequelize = new Sequelize(connectionString, {
     dialect: 'postgres',
     dialectOptions: {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false
-      }
+      ssl: app.get('postgres').ssl
     },
     logging: false,
     define: {

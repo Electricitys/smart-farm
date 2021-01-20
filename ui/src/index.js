@@ -3,10 +3,13 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { FeathersProvider } from './components/feathers';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <FeathersProvider>
+      <App />
+    </FeathersProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );

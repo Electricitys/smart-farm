@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@feathersjs/authentication-client": "^4.5.11",
+    "@feathersjs/feathers": "^4.5.11",
+    "@feathersjs/socketio-client": "^4.5.11",
     "@primer/components": "^23.0.1",
     "@primer/octicons-react": "^11.2.0",
     "@testing-library/jest-dom": "^5.11.9",
@@ -13,6 +16,7 @@
     "react-resize-detector": "^6.0.1-rc.4",
     "react-scripts": "4.0.1",
     "recharts": "^2.0.3",
+    "socket.io-client": "^2.4.0",
     "styled-components": "^5.2.1",
     "web-vitals": "^0.2.4"
   },
