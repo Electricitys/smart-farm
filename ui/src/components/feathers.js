@@ -9,7 +9,7 @@ class Feathers {
     let host = new URL(window.location.origin);
     host.protocol = process.env.REACT_APP_SERVER_PROTOCOL || window.location.protocol;
     host.hostname = process.env.REACT_APP_SERVER_HOSTNAME || window.location.hostname;
-    host.port = process.env.REACT_APP_SERVER_PORT;
+    host.port = process.env.REACT_APP_SERVER_PORT || process.env.PORT;
 
     const socket = io(host.toString());
 
