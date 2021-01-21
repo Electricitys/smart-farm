@@ -1,7 +1,12 @@
 import React from "react";
-import { AreaChart, Area, Tooltip, YAxis } from "recharts";
+import moment from "moment";
+// import { scaleTime, timeDay } from "d3";
+import { AreaChart, Area, Tooltip, YAxis, XAxis } from "recharts";
 
-const HeroWidget = ({ width, height, fields, data, selected }) => {
+const HeroWidget = ({ width, height, fields, data, selected, range }) => {
+  // const scale = scaleTime();
+  // const domain = scale.domain([moment(range[0]).toDate(), moment(range[1]).toDate()])
+  // const ticks = domain.ticks(timeDay.every(1));
   return (
     <AreaChart
       height={height || 50}
@@ -15,9 +20,13 @@ const HeroWidget = ({ width, height, fields, data, selected }) => {
           <stop offset="90%" stopColor="#2c3e50" stopOpacity={1} />
         </linearGradient>
       </defs>
-      <Tooltip />
+      <Tooltip
+        labelFormatter={(label) => {
+          return moment.unix(label).format("HH:mm:ss");
+        }} />
       {selected.map((item, idx) => (
         <Area
+          dot={{ stroke: fields.find(({ field }) => field === item).color, strokeWidth: 2 }}
           key={`${item}-area`}
           yAxisId={idx}
           isAnimationActive={false}
@@ -25,7 +34,7 @@ const HeroWidget = ({ width, height, fields, data, selected }) => {
           dataKey={item}
           stroke={fields.find(({ field }) => field === item).color}
           strokeWidth={8}
-          fillOpacity={0.75}
+          fillOpacity={1 / selected.length * 1.5}
           fill="url(#colorUv)"
         />
       ))}
@@ -38,9 +47,17 @@ const HeroWidget = ({ width, height, fields, data, selected }) => {
             stroke: fields.find(({ field }) => field === item).color
           }} />
       ))}
-      {/* <Area
-        isAnimationActive={false}
-        type="monotone" dataKey="uv" stroke="#34495e" strokeWidth={8} fillOpacity={1} fill="url(#colorUv)" /> */}
+      <XAxis
+        dataKey="updatedAt"
+        // type="number"
+        // scale="time"
+        tickFormatter={(tick) => {
+          return moment.unix(tick).format("HH:mm:ss");
+          // return moment(tick).format("ddd");
+        }}
+      // ticks={ticks}
+      // domain={[moment(range[0]).valueOf(), moment(range[1]).valueOf()]}
+      />
     </AreaChart>
   )
 }
