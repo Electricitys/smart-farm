@@ -1,12 +1,12 @@
 import React from "react";
 import moment from "moment";
-// import { scaleTime, timeDay } from "d3";
+import { scaleTime, timeDay } from "d3";
 import { AreaChart, Area, Tooltip, YAxis, XAxis } from "recharts";
 
 const HeroWidget = ({ width, height, fields, data, selected, range }) => {
-  // const scale = scaleTime();
-  // const domain = scale.domain([moment(range[0]).toDate(), moment(range[1]).toDate()])
-  // const ticks = domain.ticks(timeDay.every(1));
+  const scale = scaleTime();
+  const domain = scale.domain([moment(range[0]).unix(), moment(range[1]).unix()])
+  const ticks = domain.ticks(timeDay.every(1));
   return (
     <AreaChart
       height={height || 50}
@@ -22,41 +22,59 @@ const HeroWidget = ({ width, height, fields, data, selected, range }) => {
       </defs>
       <Tooltip
         labelFormatter={(label) => {
-          return moment.unix(label).format("HH:mm:ss");
+          return moment.unix(label).format("dddd, Do MMM");
+          // return moment.unix(label).format("HH:mm:ss");
         }} />
-      {selected.map((item, idx) => (
-        <Area
-          dot={{ stroke: fields.find(({ field }) => field === item).color, strokeWidth: 2 }}
-          key={`${item}-area`}
-          yAxisId={idx}
-          isAnimationActive={false}
-          type="monotone"
-          dataKey={item}
-          stroke={fields.find(({ field }) => field === item).color}
-          strokeWidth={8}
-          fillOpacity={1 / selected.length * 1.5}
-          fill="url(#colorUv)"
-        />
-      ))}
+      {selected.map((item, idx) => {
+        const field = fields.find(({ field }) => field === item);
+        return (
+          <Area
+            name={field.name}
+            dot={{ stroke: field.color, strokeWidth: 2 }}
+            key={`${item}-area`}
+            yAxisId={idx}
+            isAnimationActive={false}
+            type="monotone"
+            dataKey={item}
+            stroke={field.color}
+            strokeWidth={8}
+            fillOpacity={1 / selected.length * 1.5}
+            fill="url(#colorUv)"
+          />
+        )
+      })}
       {selected.map((item, idx) => (
         <YAxis
           key={`${item}-yaxis`}
           yAxisId={idx}
           mirror
+          tick={{
+            fill: fields.find(({ field }) => field === item).color
+          }}
           axisLine={{
             stroke: fields.find(({ field }) => field === item).color
           }} />
       ))}
       <XAxis
-        dataKey="updatedAt"
-        // type="number"
-        // scale="time"
-        tickFormatter={(tick) => {
-          return moment.unix(tick).format("HH:mm:ss");
-          // return moment(tick).format("ddd");
+        mirror
+        tick={{
+          fill: "white",
         }}
-      // ticks={ticks}
-      // domain={[moment(range[0]).valueOf(), moment(range[1]).valueOf()]}
+        tickSize={25}
+        tickLine={{
+          stroke: "white"
+        }}
+        dataKey="time"
+        type="number"
+        scale="time"
+        tickFormatter={(tick) => {
+          // return moment.unix(tick).format("HH:mm:ss");
+          return moment.unix(tick).format("ddd");
+        }}
+        ticks={ticks}
+        // domain={domain}
+        domain={['dataMin', 'dataMax']}
+        // domain={[moment(range[0]).unix(), moment(range[1]).unix()]}
       />
     </AreaChart>
   )

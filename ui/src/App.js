@@ -2,7 +2,6 @@ import { useContext, useEffect, useState } from "react";
 import { Avatar, Flex, Box, Button, Text, SelectMenu } from "@primer/components";
 import { HeartFillIcon, ThreeBarsIcon } from "@primer/octicons-react";
 import ReactResizeDetector from "react-resize-detector";
-import { timeFormat } from "d3";
 import moment from "moment";
 import Widget from "./components/Widget";
 import HeroWidget from "./components/HeroWidget";
@@ -19,14 +18,19 @@ function App() {
   ]);
   const [totalData, setTotalData] = useState(0);
   const [data, setData] = useState([]);
-  const [selected, setSelected] = useState(["kelengasan"]);
+  const [selected, setSelected] = useState(["kelengasan_1"]);
   const [month, setMonth] = useState(null);
   const [range, setRange] = useState([]);
   const [fields] = useState([{
     color: "#9b59b6",
-    field: "kelengasan",
-    name: "Tanah",
-    alt: "Kelengasan Tanah"
+    field: "kelengasan_1",
+    name: "Tanah I",
+    alt: "Kelengasan Tanah Bedeng I"
+  }, {
+    color: "#9b59b6",
+    field: "kelengasan_2",
+    name: "Tanah II",
+    alt: "Kelengasan Tanah Bedeng II"
   }, {
     color: "#e74c3c",
     field: "suhu",
@@ -52,23 +56,70 @@ function App() {
   useEffect(() => {
     if (range.length === 0) return;
     const fetch = async () => {
-      console.log(range);
-      const d = await feathers.datalake.find({
-        query: {
-          updatedAt: {
-            $gte: range[0],
-            $lte: range[1]
-          },
-          $limit: 100
+      let d = [];
+      try {
+        d = await feathers.datalake.find({
+          query: {
+            updatedAt: {
+              $gte: range[0],
+              $lte: range[1]
+            },
+            $limit: 100
+          }
+        });
+      } catch (e) {
+        return;
+      }
+      let resample = d.data.map((value, key) => {
+        return {
+          ...value,
+          "sampletime": moment(value.updatedAt).startOf("day").toISOString()
         }
-      });
+      }).reduce((result, {
+        sampletime,
+        kelengasan_1,
+        kelengasan_2,
+        kelembapan,
+        suhu,
+        cahaya,
+        air
+      }) => {
+        if (result[sampletime]) {
+          result[sampletime] = {
+            total: result[sampletime].total + 1,
+            kelengasan_1: (kelengasan_1 + result[sampletime].kelengasan_1) / 2,
+            kelengasan_2: (kelengasan_2 + result[sampletime].kelengasan_2) / 2,
+            suhu: (suhu + result[sampletime].suhu) / 2,
+            kelembapan: (kelembapan + result[sampletime].kelembapan) / 2,
+            cahaya: (cahaya + result[sampletime].cahaya) / 2,
+            air: (air + result[sampletime].air) / 2
+          };
+        } else {
+          result[sampletime] = {
+            total: 1,
+            kelengasan_1,
+            kelengasan_2,
+            kelembapan,
+            suhu,
+            cahaya,
+            air
+          };
+        }
+        return result;
+      }, {});
+
+      resample = Object.keys(resample).map((key) => {
+        return {
+          time: key,
+          ...resample[key]
+        }
+      })
+      
       setTotalData(d.total);
-      setData(d.data.map((data) => {
-        const date = timeFormat(data);
-        console.log(date);
+      setData(resample.map((data) => {
         return {
           ...data,
-          updatedAt: moment(d.updatedAt).valueOf()
+          time: moment(data.time).unix()
         }
       }));
     }
@@ -86,7 +137,7 @@ function App() {
     const startRange = currentRange.startOf("month").toISOString();
     const endRange = currentRange.endOf("month").toISOString();
     setRange([startRange, endRange]);
-    
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [month]);
 

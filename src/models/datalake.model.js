@@ -6,7 +6,11 @@ const DataTypes = Sequelize.DataTypes;
 module.exports = function (app) {
   const sequelizeClient = app.get('sequelizeClient');
   const datalake = sequelizeClient.define('datalake', {
-    kelengasan: {
+    kelengasan_1: {
+      type: DataTypes.DECIMAL,
+      allowNull: false
+    },
+    kelengasan_2: {
       type: DataTypes.DECIMAL,
       allowNull: false
     },

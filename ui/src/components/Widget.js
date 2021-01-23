@@ -35,7 +35,7 @@ const Widget = ({ name, field, style, color, data, active }) => {
           <ReactResizeDetector>
             {({ width, height, targetRef }) => (
               <Box ref={targetRef} flexGrow={1}>
-                <WidgetChart field={field} color={color} width={width} height={height} data={data} />
+                <WidgetChart label={name} field={field} color={color} width={width} height={height} data={data} />
               </Box>)}
           </ReactResizeDetector>
         </Flex>
