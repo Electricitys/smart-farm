@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+import 'react-virtualized/styles.css';
 import "react-datepicker/dist/react-datepicker.css";
 import App from './App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
@@ -8,11 +9,11 @@ import reportWebVitals from './reportWebVitals';
 import { FeathersProvider } from './components/feathers';
 
 ReactDOM.render(
-  <React.StrictMode>
+  // <React.StrictMode>
     <FeathersProvider>
       <App />
-    </FeathersProvider>
-  </React.StrictMode>,
+    </FeathersProvider>,
+  // </React.StrictMode>,
   document.getElementById('root')
 );
 
