@@ -81,7 +81,6 @@ const TableView = () => {
             time: moment(updatedAt).calendar()
           }
         })
-        console.log(resample);
         await setData(resample);
         await setTotalData(d.total);
       } catch (e) {

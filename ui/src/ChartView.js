@@ -153,7 +153,7 @@ function ChartView() {
           >Smart Farm</Text>
         </Box>
         <Box>
-          <Avatar size={48} src="https://avatars.githubusercontent.com/github" />
+          <Avatar size={48} src="https://avatars.githubusercontent.com/primer" />
         </Box>
       </Flex>
       <Flex px={4} pb={3} alignItems="center">

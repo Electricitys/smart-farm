@@ -10,9 +10,9 @@ import { FeathersProvider } from './components/feathers';
 
 ReactDOM.render(
   // <React.StrictMode>
-    <FeathersProvider>
-      <App />
-    </FeathersProvider>,
+  <FeathersProvider>
+    <App />
+  </FeathersProvider>,
   // </React.StrictMode>,
   document.getElementById('root')
 );

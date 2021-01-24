@@ -1,13 +1,12 @@
 import {
   BrowserRouter,
   Route,
-  Switch,
-  Link
+  Switch
 } from "react-router-dom";
-import { Flex, Box, Button, Text, SelectMenu } from "@primer/components";
-import { HeartFillIcon, ThreeBarsIcon } from "@primer/octicons-react";
+import { Flex, Box } from "@primer/components";
 import ChartView from "./ChartView";
 import TableView from "./TableView";
+import Header from "./components/Header";
 
 function App() {
   return (
@@ -33,21 +32,7 @@ function App() {
             margin: "0 auto"
           }}>
           <Box py={2} px={4}>
-            <SelectMenu>
-              <Button as="summary" variant="medium">
-                <ThreeBarsIcon size={16} />
-              </Button>
-              <SelectMenu.Modal>
-                <SelectMenu.Header>Halaman</SelectMenu.Header>
-                <SelectMenu.List>
-                  <SelectMenu.Item as={Link} to="/">Chart</SelectMenu.Item>
-                  <SelectMenu.Item as={Link} to="/table">Table</SelectMenu.Item>
-                </SelectMenu.List>
-                <SelectMenu.Footer>
-                  <Text>Made with <Text color="red.5"><HeartFillIcon size={12} /></Text> by tagConn</Text>
-                </SelectMenu.Footer>
-              </SelectMenu.Modal>
-            </SelectMenu>
+            <Header />
           </Box>
           <Switch>
             <Route path="/table" component={TableView} />
@@ -55,7 +40,7 @@ function App() {
           </Switch>
         </Flex>
       </Box>
-    </BrowserRouter>
+    </BrowserRouter >
   );
 }
 
