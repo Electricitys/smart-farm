@@ -1,15 +1,19 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import moment from "moment";
 import ReactResizeDetector from "react-resize-detector";
 import { Flex, Box, Button, Text, SelectMenu, BorderBox } from "@primer/components";
 import DatePicker from "react-datepicker";
 import Table from "./components/Table";
+import { FeathersContext } from "./components/feathers";
 
 const TableView = () => {
+  const feathers = useContext(FeathersContext);
   const [range, setRange] = useState([
     moment().subtract(2, "day").startOf("day").toDate(),
     moment().endOf("day").toDate(),
   ]);
+  const [totalData, setTotalData] = useState(0);
+  const [data, setData] = useState([]);
   const [selected, setSelected] = useState(["kelengasan_1"]);
   const [fields] = useState([{
     color: "#9b59b6",
@@ -43,15 +47,77 @@ const TableView = () => {
     alt: "Air yang digunakan"
   }]);
 
+  useEffect(() => {
+    const fetch = async () => {
+      let d = [];
+      try {
+        d = await feathers.datalake.find({
+          query: {
+            updatedAt: {
+              $gte: range[0].toISOString(),
+              $lte: range[1].toISOString(),
+            },
+            $limit: 100
+          }
+        })
+        const resample = d.data.map(({
+          id,
+          kelengasan_1,
+          kelengasan_2,
+          suhu,
+          kelembapan,
+          cahaya,
+          air,
+          updatedAt
+        }) => {
+          return {
+            id,
+            kelengasan_1,
+            kelengasan_2,
+            suhu,
+            kelembapan,
+            cahaya,
+            air,
+            time: moment(updatedAt).calendar()
+          }
+        })
+        console.log(resample);
+        await setData(resample);
+        await setTotalData(d.total);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    fetch();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [range]);
+
   return (
     <>
-      <Text
-        as="h5"
-        px={4}
-        m={0}
-        color="gray.4"
-        fontWeight="normal"
-      >Laporan</Text>
+      <Flex alignItems="center">
+        <Box flexGrow={1}>
+          <Text
+            as="h5"
+            px={4}
+            m={0}
+            color="gray.4"
+            fontWeight="normal"
+          >Laporan</Text>
+        </Box>
+        <Box>
+          <Text
+            as="p"
+            px={4}
+            m={0}
+            color="gray.4"
+            fontSize="0.83em"
+            fontWeight="normal"
+          >
+            Total <Text fontWeight="bolder" color="gray.5">{totalData}</Text>
+          </Text>
+        </Box>
+      </Flex>
       <Flex px={4} alignItems="center">
         <Box flexGrow={1}>
           <Text
@@ -140,44 +206,47 @@ const TableView = () => {
           </Box>
         ))}
       </Box>
-      <Box flexGrow={1} style={{ position: "relative" }}>
-        <Flex
-          px={4} pb={3}
-          style={{
-            position: "absolute",
-            top: 0, left: 0, right: 0,
-            bottom: 0
-          }}
+      <Flex
+        flexGrow={1}
+        px={4} pb={3}
+      >
+        <BorderBox
+          as={Flex}
+          width="100%"
+          flexGrow={1}
+          p={2}
+          backgroundColor="white"
         >
-          <BorderBox
-            flexGrow={1}
-            p={2}
-            backgroundColor="white"
-          >
+          <Box width="100%" style={{ position: "relative" }}>
             <ReactResizeDetector>
               {({ width, height, targetRef }) => (
                 <Box
-                  height="100%"
                   ref={targetRef}
+                  style={{
+                    position: "absolute",
+                    top: 0, left: 0, right: 0,
+                    bottom: 0
+                  }}
                 >
                   <Table
                     width={width}
                     height={height}
-                    list={[]}
+                    list={data}
+                    count={totalData}
                     selected={["time", ...selected]}
                     column={[
                       {
                         dataKey: "time",
                         label: "Timestamp",
-                        width: 50
+                        width: 175
                       }, {
                         dataKey: "kelengasan_1",
                         label: "Tanah I",
-                        width: 50
+                        width: 75
                       }, {
                         dataKey: "kelengasan_2",
                         label: "Tanah II",
-                        width: 50
+                        width: 75
                       }, {
                         dataKey: "suhu",
                         label: "Suhu",
@@ -185,7 +254,7 @@ const TableView = () => {
                       }, {
                         dataKey: "kelembapan",
                         label: "Kelembapan",
-                        width: 50
+                        width: 150
                       }, {
                         dataKey: "cahaya",
                         label: "Cahaya",
@@ -195,12 +264,14 @@ const TableView = () => {
                         label: "Air",
                         width: 50
                       }
-                    ]} />
-                </Box>)}
+                    ]}
+                  />
+                </Box>
+              )}
             </ReactResizeDetector>
-          </BorderBox>
-        </Flex>
-      </Box>
+          </Box>
+        </BorderBox>
+      </Flex>
     </>
   )
 }

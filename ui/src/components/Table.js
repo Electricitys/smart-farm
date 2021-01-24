@@ -1,17 +1,17 @@
-import { Box } from "@primer/components";
+import { Box, Truncate } from "@primer/components";
 import { Component } from "react";
 import { Column, Table as RVTable } from "react-virtualized";
 
 class Table extends Component {
 
   render() {
-    const { width, height, column, selected } = this.props;
+    const { width, height, count, column, selected } = this.props;
     return (
       <RVTable
         width={width || 10}
         height={height || 10}
         deferredMeasurementCache={this._cache}
-        rowCount={30}
+        rowCount={count}
         headerHeight={20}
         rowHeight={30}
         rowGetter={({ index }) => {
@@ -19,13 +19,13 @@ class Table extends Component {
         }}
       >
         {selected.map((key) => {
-          const { label, dataKey } = column.find(val => val.dataKey === key);
+          const { label, dataKey, width } = column.find(val => val.dataKey === key);
           return (
             <Column
               key={label}
               label={label}
               dataKey={dataKey}
-              width={width / selected.length}
+              width={width}
               cellRenderer={this._columnCellRenderer}
             />
           )
@@ -34,11 +34,13 @@ class Table extends Component {
     )
   }
 
-  _columnCellRenderer = ({ dataKey, parent, rowIndex }) => {
-
+  _columnCellRenderer = ({ dataKey, rowIndex }) => {
+    const { list } = this.props;
     return (
       <Box>
-        {`${dataKey}-${rowIndex}`}
+        <Truncate maxWidth={175} title={`${list[rowIndex][dataKey]}` || ""}>
+          {list[rowIndex][dataKey]}
+        </Truncate>
       </Box>
     )
   }
