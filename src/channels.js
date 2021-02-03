@@ -61,7 +61,7 @@ module.exports = function (app) {
 
   app.service('datalake').publish('created', () => {
     return [
-      app.channel(`anonymous`)
+      app.channel('anonymous')
     ];
   });
 };

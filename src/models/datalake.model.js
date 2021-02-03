@@ -14,6 +14,10 @@ module.exports = function (app) {
       type: DataTypes.DECIMAL,
       allowNull: false
     },
+    kelengasan_3: {
+      type: DataTypes.DECIMAL,
+      allowNull: false
+    },
     suhu: {
       type: DataTypes.INTEGER,
       allowNull: false

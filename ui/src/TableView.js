@@ -26,6 +26,11 @@ const TableView = () => {
     name: "Tanah II",
     alt: "Kelengasan Tanah Bedeng II"
   }, {
+    color: "#9b59b6",
+    field: "kelengasan_3",
+    name: "Tanah III",
+    alt: "Kelengasan Tanah Bedeng III"
+  }, {
     color: "#e74c3c",
     field: "suhu",
     name: "Suhu",
@@ -64,6 +69,7 @@ const TableView = () => {
           id,
           kelengasan_1,
           kelengasan_2,
+          kelengasan_3,
           suhu,
           kelembapan,
           cahaya,
@@ -74,6 +80,7 @@ const TableView = () => {
             id,
             kelengasan_1,
             kelengasan_2,
+            kelengasan_3,
             suhu,
             kelembapan,
             cahaya,
@@ -245,6 +252,10 @@ const TableView = () => {
                       }, {
                         dataKey: "kelengasan_2",
                         label: "Tanah II",
+                        width: 75
+                      }, {
+                        dataKey: "kelengasan_3",
+                        label: "Tanah III",
                         width: 75
                       }, {
                         dataKey: "suhu",

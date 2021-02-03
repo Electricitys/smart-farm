@@ -26,8 +26,9 @@
   "scripts": {
     "postinstall": "npm run install:ui",
     "install:ui": "cd ui && npm install",
-    "heroku-postbuild": "npm run build:ui",
+    "build": "npm run lint",
     "build:ui": "cd ui && npm run build && cp -Rf ./build/. ../public/.",
+    "postbuild": "npm run build:ui",
     "test": "npm run lint && npm run mocha",
     "lint": "eslint src/. test/. --config .eslintrc.json --fix",
     "dev": "nodemon src/",

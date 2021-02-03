@@ -31,6 +31,11 @@ function ChartView() {
     name: "Tanah II",
     alt: "Kelengasan Tanah Bedeng II"
   }, {
+    color: "#9b59b6",
+    field: "kelengasan_3",
+    name: "Tanah III",
+    alt: "Kelengasan Tanah Bedeng III"
+  }, {
     color: "#e74c3c",
     field: "suhu",
     name: "Suhu",
@@ -78,6 +83,7 @@ function ChartView() {
         sampletime,
         kelengasan_1,
         kelengasan_2,
+        kelengasan_3,
         kelembapan,
         suhu,
         cahaya,
@@ -88,6 +94,7 @@ function ChartView() {
             total: result[sampletime].total + 1,
             kelengasan_1: (kelengasan_1 + result[sampletime].kelengasan_1) / 2,
             kelengasan_2: (kelengasan_2 + result[sampletime].kelengasan_2) / 2,
+            kelengasan_3: (kelengasan_3 + result[sampletime].kelengasan_3) / 2,
             suhu: (suhu + result[sampletime].suhu) / 2,
             kelembapan: (kelembapan + result[sampletime].kelembapan) / 2,
             cahaya: (cahaya + result[sampletime].cahaya) / 2,
@@ -98,6 +105,7 @@ function ChartView() {
             total: 1,
             kelengasan_1,
             kelengasan_2,
+            kelengasan_3,
             kelembapan,
             suhu,
             cahaya,
