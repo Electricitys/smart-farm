@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import moment from "moment";
 import ReactResizeDetector from "react-resize-detector";
 import { Flex, Box, Button, Text, SelectMenu, BorderBox } from "@primer/components";
@@ -12,6 +12,7 @@ const TableView = () => {
     moment().subtract(2, "day").startOf("day").toDate(),
     moment().endOf("day").toDate(),
   ]);
+  const [isLoaded, setIsLoaded] = useState(false);
   const [totalData, setTotalData] = useState(0);
   const [data, setData] = useState([]);
   const [selected, setSelected] = useState(["kelengasan_1"]);
@@ -52,52 +53,64 @@ const TableView = () => {
     alt: "Air yang digunakan"
   }]);
 
-  useEffect(() => {
-    const fetch = async () => {
-      let d = [];
-      try {
-        d = await feathers.datalake.find({
-          query: {
-            updatedAt: {
-              $gte: range[0].toISOString(),
-              $lte: range[1].toISOString(),
-            },
-            $limit: 100
-          }
-        })
-        const resample = d.data.map(({
-          id,
-          kelengasan_1,
-          kelengasan_2,
-          kelengasan_3,
-          suhu,
-          kelembapan,
-          cahaya,
-          air,
-          updatedAt
-        }) => {
-          return {
-            id,
-            kelengasan_1,
-            kelengasan_2,
-            kelengasan_3,
-            suhu,
-            kelembapan,
-            cahaya,
-            air,
-            time: moment(updatedAt).calendar()
-          }
-        })
-        await setData(resample);
-        await setTotalData(d.total);
-      } catch (e) {
-        console.error(e);
+  const resample = useCallback((data) => {
+    const resample = data.map(({
+      id,
+      kelengasan_1,
+      kelengasan_2,
+      kelengasan_3,
+      suhu,
+      kelembapan,
+      cahaya,
+      air,
+      updatedAt
+    }) => {
+      return {
+        id,
+        kelengasan_1,
+        kelengasan_2,
+        kelengasan_3,
+        suhu,
+        kelembapan,
+        cahaya,
+        air,
+        time: moment(updatedAt).calendar()
       }
+    })
+    return resample;
+  }, [])
+
+  const fetch = useCallback(async (skip) => {
+    let d = [];
+    try {
+      d = await feathers.datalake.find({
+        query: {
+          updatedAt: {
+            $gte: range[0].toISOString(),
+            $lte: range[1].toISOString(),
+          },
+          $skip: skip,
+          $limit: 25
+        }
+      });
+
+    } catch (e) {
+      console.error(e);
     }
-    fetch();
+    return d;
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [range]);
+
+  useEffect(() => {
+    fetch(0).then(async (res) => {
+      const data = resample(res.data);
+      await setData(data);
+      await setTotalData(res.total);
+      await setIsLoaded(true);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetch]);
 
   return (
     <>
@@ -120,6 +133,9 @@ const TableView = () => {
             fontSize="0.83em"
             fontWeight="normal"
           >
+            {!isLoaded && <Text>{"Loading... "}</Text>}
+            {(isLoaded && totalData === 0) &&
+              <Text fontWeight="bolder" color="red.5">{"No Data Recorded "}</Text>}
             Total <Text fontWeight="bolder" color="gray.5">{totalData}</Text>
           </Text>
         </Box>
@@ -239,6 +255,12 @@ const TableView = () => {
                     height={height}
                     list={data}
                     count={totalData}
+                    onLoadMoreRows={({ startIndex }) => {
+                      fetch(startIndex).then(async (res) => {
+                        const d = resample(res.data);
+                        await setData(data => [...data, ...d]);
+                      });
+                    }}
                     selected={["time", ...selected]}
                     column={[
                       {
