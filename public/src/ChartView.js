@@ -7,6 +7,8 @@ import HeroWidget from "./components/HeroWidget";
 import { FeathersContext } from "./components/feathers";
 import Dropdown from "./components/Dropdown";
 
+import _sortBy from "lodash.sortby";
+
 function ChartView() {
   const feathers = useContext(FeathersContext);
   const [months] = useState([
@@ -64,6 +66,7 @@ function ChartView() {
       try {
         d = await feathers.datalake.find({
           query: {
+            $sample: "day",
             updatedAt: {
               $gte: range[0],
               $lte: range[1]
@@ -74,55 +77,17 @@ function ChartView() {
       } catch (e) {
         return;
       }
-      let resample = d.data.map((value, key) => {
-        return {
-          ...value,
-          "sampletime": moment(value.updatedAt).startOf("day").toISOString()
-        }
-      }).reduce((result, {
-        sampletime,
-        kelengasan_1,
-        kelengasan_2,
-        kelengasan_3,
-        kelembapan,
-        suhu,
-        cahaya,
-        air
-      }) => {
-        if (result[sampletime]) {
-          result[sampletime] = {
-            total: result[sampletime].total + 1,
-            kelengasan_1: (kelengasan_1 + result[sampletime].kelengasan_1) / 2,
-            kelengasan_2: (kelengasan_2 + result[sampletime].kelengasan_2) / 2,
-            kelengasan_3: (kelengasan_3 + result[sampletime].kelengasan_3) / 2,
-            suhu: (suhu + result[sampletime].suhu) / 2,
-            kelembapan: (kelembapan + result[sampletime].kelembapan) / 2,
-            cahaya: (cahaya + result[sampletime].cahaya) / 2,
-            air: (air + result[sampletime].air) / 2
-          };
-        } else {
-          result[sampletime] = {
-            total: 1,
-            kelengasan_1,
-            kelengasan_2,
-            kelengasan_3,
-            kelembapan,
-            suhu,
-            cahaya,
-            air
-          };
-        }
-        return result;
-      }, {});
 
-      resample = Object.keys(resample).map((key) => {
+      let resample = d.data.map((value) => {
         return {
-          time: key,
-          ...resample[key]
+          time: value.id,
+          ...value
         }
-      })
+      });
 
-      setTotalData(d.total);
+      resample = _sortBy(resample, "time")
+
+      setTotalData(d.total.length);
       setData(resample.map((data) => {
         return {
           ...data,

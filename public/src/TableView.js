@@ -5,6 +5,7 @@ import { Flex, Box, Button, Text, SelectMenu, BorderBox } from "@primer/componen
 import DatePicker from "react-datepicker";
 import Table from "./components/Table";
 import { FeathersContext } from "./components/feathers";
+import _sortBy from "lodash.sortby";
 
 const TableView = () => {
   const feathers = useContext(FeathersContext);
@@ -54,38 +55,22 @@ const TableView = () => {
   }]);
 
   const resample = useCallback((data) => {
-    const resample = data.map(({
-      id,
-      kelengasan_1,
-      kelengasan_2,
-      kelengasan_3,
-      suhu,
-      kelembapan,
-      cahaya,
-      air,
-      updatedAt
-    }) => {
-      return {
-        id,
-        kelengasan_1,
-        kelengasan_2,
-        kelengasan_3,
-        suhu,
-        kelembapan,
-        cahaya,
-        air,
-        time: moment(updatedAt).calendar()
-      }
-    })
-    return resample;
-  }, [])
+    let res = data.map(value => ({
+      time: moment(value.id).calendar(),
+      ...value,
+    }));
+    res = _sortBy(res, "id");
+    return res;
+    
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
 
   const fetch = useCallback(async (skip) => {
     let d = [];
     try {
       d = await feathers.datalake.find({
         query: {
-          updatedAt: {
+          createdAt: {
             $gte: range[0].toISOString(),
             $lte: range[1].toISOString(),
           },
@@ -104,9 +89,11 @@ const TableView = () => {
 
   useEffect(() => {
     fetch(0).then(async (res) => {
-      const data = resample(res.data);
+      let data = resample(res.data);
+      console.log(res);
+      console.log(data);
       await setData(data);
-      await setTotalData(res.total);
+      await setTotalData(res.total.length);
       await setIsLoaded(true);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -258,6 +245,7 @@ const TableView = () => {
                     onLoadMoreRows={({ startIndex }) => {
                       fetch(startIndex).then(async (res) => {
                         const d = resample(res.data);
+                        console.log(d);
                         await setData(data => [...data, ...d]);
                       });
                     }}

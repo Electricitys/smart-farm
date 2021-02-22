@@ -27,8 +27,7 @@ function App() {
           style={{
             height: "100%",
             maxWidth: 500,
-            overflowX: "hidden",
-            overflowY: "auto",
+            overflow: "hidden",
             margin: "0 auto"
           }}>
           <Box py={2} px={4}>
