@@ -9,7 +9,7 @@ import Dropdown from "./components/Dropdown";
 
 import _sortBy from "lodash.sortby";
 
-function ChartView() {
+function ChartView({ setFullscreen }) {
   const feathers = useContext(FeathersContext);
   const [months] = useState([
     "Januari", "Februari", "Maret",
@@ -112,6 +112,12 @@ function ChartView() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [month]);
+
+  useEffect(() => {
+    setFullscreen(false);
+    
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>

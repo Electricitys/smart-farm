@@ -33,6 +33,10 @@ module.exports = function (app) {
     air: {
       type: DataTypes.DECIMAL,
       allowNull: false
+    },
+    debit: {
+      type: DataTypes.DECIMAL,
+      allowNull: false
     }
   }, {
     hooks: {

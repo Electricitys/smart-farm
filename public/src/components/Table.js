@@ -65,7 +65,7 @@ class Table extends Component {
     }
     return (
       <Box>
-        <Truncate maxWidth={175} title={`${value}` || ""}>
+        <Truncate fontSize={1} maxWidth={175} title={`${value}` || ""}>
           {`${value}` || "empty"}
         </Truncate>
       </Box>

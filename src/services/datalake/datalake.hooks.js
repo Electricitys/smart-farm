@@ -1,7 +1,8 @@
+const resampleData = require('../../hooks/resample-data');
 module.exports = {
   before: {
     all: [],
-    find: [],
+    find: [resampleData()],
     get: [],
     create: [],
     update: [],

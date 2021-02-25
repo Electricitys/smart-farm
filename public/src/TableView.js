@@ -7,7 +7,7 @@ import Table from "./components/Table";
 import { FeathersContext } from "./components/feathers";
 import _sortBy from "lodash.sortby";
 
-const TableView = () => {
+const TableView = ({ setFullscreen }) => {
   const feathers = useContext(FeathersContext);
   const [range, setRange] = useState([
     moment().subtract(2, "day").startOf("day").toDate(),
@@ -16,7 +16,7 @@ const TableView = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [totalData, setTotalData] = useState(0);
   const [data, setData] = useState([]);
-  const [selected, setSelected] = useState(["kelengasan_1"]);
+  const [selected, setSelected] = useState(["kelengasan_1", "suhu", "kelembapan"]);
   const [fields] = useState([{
     color: "#9b59b6",
     field: "kelengasan_1",
@@ -40,7 +40,7 @@ const TableView = () => {
   }, {
     color: "#2ecc71",
     field: "kelembapan",
-    name: "Kelembapan",
+    name: "Kelembaban",
     alt: "Kelembapan Lingkungan"
   }, {
     color: "#f1c40f",
@@ -55,13 +55,24 @@ const TableView = () => {
   }]);
 
   const resample = useCallback((data) => {
+    const parse = (val) => {
+      return Math.abs(Number(val).toFixed(2));
+    }
     let res = data.map(value => ({
-      time: moment(value.id).calendar(),
+      time: moment(value.id).format("Do MMM 'YY, hh:mm:a"),
       ...value,
+      kelengasan_1: parse(value["kelengasan_1"] - 50),
+      kelengasan_2: parse(value["kelengasan_2"] - 50),
+      kelengasan_3: parse(value["kelengasan_3"] - 50),
+      suhu: parse(value["suhu"]),
+      kelembapan: parse(value["kelembapan"]),
+      air: parse(value["air"]),
+      cahaya: parse(value["cahaya"]),
     }));
     res = _sortBy(res, "id");
+    console.log(res);
     return res;
-    
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
@@ -70,6 +81,7 @@ const TableView = () => {
     try {
       d = await feathers.datalake.find({
         query: {
+          $sample: "hour",
           createdAt: {
             $gte: range[0].toISOString(),
             $lte: range[1].toISOString(),
@@ -88,12 +100,20 @@ const TableView = () => {
   }, [range]);
 
   useEffect(() => {
+    setFullscreen(true);
+    
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     fetch(0).then(async (res) => {
       let data = resample(res.data);
       console.log(res);
       console.log(data);
-      await setData(data);
-      await setTotalData(res.total.length);
+      if (data.length > 0) {
+        await setData(data);
+        await setTotalData(res.total.length);
+      }
       await setIsLoaded(true);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -137,14 +157,14 @@ const TableView = () => {
             fontWeight="bold"
           >Tabel</Text>
         </Box>
-        <Box>
+        <Box sx={{ position: "relative" }}>
           <SelectMenu>
             <Button as="summary" variant="medium">
-              {moment(range[0]).format("Do MMM YY")}
+              {moment(range[0]).format("Do MMM 'YY")}
               {" \u2192 "}
-              {moment(range[1]).format("Do MMM YY")}
+              {moment(range[1]).format("Do MMM 'YY")}
             </Button>
-            <SelectMenu.Modal >
+            <SelectMenu.Modal align="right">
               <SelectMenu.Header>Calendar</SelectMenu.Header>
               <SelectMenu.Tabs>
                 <SelectMenu.Tab index={0} tabName="From" />
@@ -186,7 +206,7 @@ const TableView = () => {
         style={{ overflowY: "auto", whiteSpace: "nowrap" }}
         flexShrink={0}
       >
-        {fields.map(({ field, name }) => (
+        {fields.map(({ field, name, alt }) => (
           <Box
             key={field}
             px={2}
@@ -194,8 +214,11 @@ const TableView = () => {
           >
             <BorderBox
               p={2}
+              role="button"
+              title={alt}
               backgroundColor="white"
               borderColor={(selected.indexOf(field) !== -1) ? "blue.5" : undefined}
+              sx={{ cursor: "pointer" }}
               onClick={() => {
                 setSelected(selected => {
                   if (selected.indexOf(field) !== -1) {
@@ -203,8 +226,8 @@ const TableView = () => {
                       return selected;
                     return selected.filter(item => item !== field);
                   } else {
-                    if (selected.length >= 2)
-                      return selected;
+                    // if (selected.length >= 4)
+                    //   return selected;
                     return [...selected, field];
                   }
                 })
@@ -254,7 +277,7 @@ const TableView = () => {
                       {
                         dataKey: "time",
                         label: "Timestamp",
-                        width: 175
+                        width: 165
                       }, {
                         dataKey: "kelengasan_1",
                         label: "Tanah I",
@@ -266,19 +289,19 @@ const TableView = () => {
                       }, {
                         dataKey: "kelengasan_3",
                         label: "Tanah III",
-                        width: 75
+                        width: 90
                       }, {
                         dataKey: "suhu",
                         label: "Suhu",
                         width: 50
                       }, {
                         dataKey: "kelembapan",
-                        label: "Kelembapan",
-                        width: 150
+                        label: "Kelembaban",
+                        width: 110
                       }, {
                         dataKey: "cahaya",
                         label: "Cahaya",
-                        width: 50
+                        width: 75
                       }, {
                         dataKey: "air",
                         label: "Air",

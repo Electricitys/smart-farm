@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import 'react-virtualized/styles.css';
 import "react-datepicker/dist/react-datepicker.css";
+import {
+  BrowserRouter
+} from "react-router-dom";
 import App from './App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
@@ -11,7 +14,9 @@ import { FeathersProvider } from './components/feathers';
 ReactDOM.render(
   // <React.StrictMode>
   <FeathersProvider>
+  <BrowserRouter>
     <App />
+    </BrowserRouter >
   </FeathersProvider>,
   // </React.StrictMode>,
   document.getElementById('root')
