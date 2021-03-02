@@ -36,7 +36,7 @@ module.exports = function (app) {
     },
     debit: {
       type: DataTypes.DECIMAL,
-      allowNull: false
+      allowNull: true
     }
   }, {
     hooks: {

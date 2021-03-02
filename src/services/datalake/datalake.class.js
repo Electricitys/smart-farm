@@ -1,4 +1,5 @@
 const { Service } = require('feathers-sequelize');
+const moment = require('moment');
 // const logger = require('../../logger');
 
 exports.Datalake = class Datalake extends Service {
@@ -11,17 +12,32 @@ exports.Datalake = class Datalake extends Service {
   }
 
   async create(data, params) {
-    // logger.info(`create air: ${data.air}\n\t`, data);
+    const now = moment().startOf('minutes');
+    const reminder = 5 - (now.get('minute') % 5);
+    const round = moment(now)
+      .add(reminder, 'minutes')
+      .subtract(5, 'minutes')
+      ;
 
-    // let { data: lastData } = await this.find({ query: { $limit: 1, $sort: { createdAt: -1 } } });
-    // lastData = lastData[0];
+    let { data: lastData } = await this.find({
+      query: {
+        $limit: 1,
+        createdAt: {
+          $gte: round.toISOString()
+        },
+        $sort: { createdAt: -1 }
+      }
+    });
+    lastData = lastData[0];
 
-    // let tinggi = lastData.air - 10;
-    // if (tinggi < 10) tinggi = 10;
-    // if(data.air > tinggi) tinggi = tinggi - data.air;
-    // let debit = air;
-
-    // logger.info(`find last air ${lastData.air} \n\t`, lastData);
+    if (lastData) {
+      let patchData = {};
+      Object.keys(data).forEach(key => {
+        patchData[key] = (data[key] + lastData[key]) / 2;
+      });
+      return this.patch(lastData.id, patchData);
+    }
+    data.createdAt = round.toISOString();
     return super.create(data, params);
   }
 };
