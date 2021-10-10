@@ -2,8 +2,8 @@
 
 ## Code
 
-Arduino Code at `uno` directory\
-Wemos Code at `esp` directory
+Arduino Code at `uno/` directory\
+Wemos Code at `esp/` directory
 
 ## Schema
 

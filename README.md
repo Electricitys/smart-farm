@@ -1,10 +1,14 @@
-# plz-smart-farm
+# smart-farm
 
 > 
 
 ## About
 
 This project uses [Feathers](http://feathersjs.com). An open source web framework for building modern real-time applications.
+
+## Plant
+
+Read more at `plant/` directory
 
 ## Getting Started
 
