@@ -54,11 +54,11 @@ void getLevel() {
 bool sent(void *) {
   String  data = "{";
           data += "\"kelengasan_1\":";
-          data += tanah[0];
+          data += (0.374 * tanah[0]) + 17.904;
           data += ",\"kelengasan_2\":";
-          data += tanah[1];
+          data += (0.1789 * tanah[1]) + 27;
           data += ",\"kelengasan_3\":";
-          data += tanah[2];
+          data += (0.0435 * tanah[2]) + 32.735;
           data += ",\"suhu\":";
           data += temp;
           data += ",\"kelembapan\":";
