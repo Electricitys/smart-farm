@@ -79,6 +79,23 @@ function ChartView({ setFullscreen }) {
       }
 
       let resample = d.data.map((value) => {
+        for (let key in value) {
+          if ([
+            "kelengasan_1",
+            "kelengasan_2",
+            "kelengasan_3",
+            "suhu",
+            "kelembapan",
+            "air",
+            "cahaya"
+          ].indexOf(key) === -1) continue;
+          try {
+            let num = Math.round(Math.abs(value[key]) * 100) / 100;
+            value[key] = num;
+          } catch (err) {
+            // do nothing
+          }
+        }
         return {
           time: value.id,
           ...value
@@ -115,7 +132,7 @@ function ChartView({ setFullscreen }) {
 
   useEffect(() => {
     setFullscreen(false);
-    
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
