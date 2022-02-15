@@ -5,7 +5,17 @@ import { Flex, Box, Button, Text, SelectMenu, BorderBox } from "@primer/componen
 import DatePicker from "react-datepicker";
 import Table from "./components/Table";
 import { FeathersContext } from "./components/feathers";
-import _sortBy from "lodash.sortby";
+
+const sortDataWithDate = (array, field) => {
+  let arr = [...array];
+  arr.sort(function compare(a, b) {
+    var dateA = new Date(a[field]);
+    var dateB = new Date(b[field]);
+    return dateA - dateB;
+  });
+  return arr;
+}
+
 
 const TableView = ({ setFullscreen }) => {
   const feathers = useContext(FeathersContext);
@@ -61,16 +71,15 @@ const TableView = ({ setFullscreen }) => {
     let res = data.map(value => ({
       time: moment(value.id).format("Do MMM 'YY, hh:mm:a"),
       ...value,
-      kelengasan_1: parse(value["kelengasan_1"] - 50),
-      kelengasan_2: parse(value["kelengasan_2"] - 50),
-      kelengasan_3: parse(value["kelengasan_3"] - 50),
+      kelengasan_1: parse(value["kelengasan_1"]),
+      kelengasan_2: parse(value["kelengasan_2"]),
+      kelengasan_3: parse(value["kelengasan_3"]),
       suhu: parse(value["suhu"]),
       kelembapan: parse(value["kelembapan"]),
       air: parse(value["air"]),
       cahaya: parse(value["cahaya"]),
     }));
-    res = _sortBy(res, "id");
-    console.log(res);
+    res = sortDataWithDate(res, "id");
     return res;
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -101,15 +110,13 @@ const TableView = ({ setFullscreen }) => {
 
   useEffect(() => {
     setFullscreen(true);
-    
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     fetch(0).then(async (res) => {
       let data = resample(res.data);
-      console.log(res);
-      console.log(data);
       if (data.length > 0) {
         await setData(data);
         await setTotalData(res.total.length);
@@ -268,7 +275,6 @@ const TableView = ({ setFullscreen }) => {
                     onLoadMoreRows={({ startIndex }) => {
                       fetch(startIndex).then(async (res) => {
                         const d = resample(res.data);
-                        console.log(d);
                         await setData(data => [...data, ...d]);
                       });
                     }}
